@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>右键菜单示例</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .context-menu {
+            display: none;
+            position: absolute;
+            width: 150px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .context-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .context-menu li {
+            padding: 8px 15px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .context-menu li:hover {
+            background-color: #f0f0f0;
+        }
+
+        .highlighted {
+            background-color: yellow;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="content" id="content">
+        <p>请在这段文本中选中一些内容，然后右键点击，会出现一个上下文菜单。</p>
+        <p>你可以尝试选中这段文字中的任意部分，然后右键点击查看效果。</p>
+        <p>这是一个演示右键菜单功能的示例页面，你可以复制、翻译、搜索。</p>
+    </div>
+    
+    <div class="context-menu" id="contextMenu">
+        <ul>
+            <li id="copy">复制</li>
+            <li id="translate">翻译</li>
+            <li id="search">搜索</li>
+        </ul>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const content = document.getElementById('content');
+            const contextMenu = document.getElementById('contextMenu');
+            let selectedText = '';
+            
+            // 阻止默认的右键菜单
+            content.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                
+                // 获取选中的文本
+                selectedText = window.getSelection().toString().trim();
+                
+                if (selectedText) {
+                    // 显示自定义菜单
+                    showContextMenu(e);
+                }
+            });
+            
+            // 点击其他地方隐藏菜单
+            document.addEventListener('click', function() {
+                hideContextMenu();
+            });
+            
+            // 菜单项点击事件
+            document.getElementById('copy').addEventListener('click', function() {
+                copyToClipboard(selectedText);
+                hideContextMenu();
+            });
+            
+            document.getElementById('search').addEventListener('click', function() {
+                searchOnGoogle(selectedText);
+                hideContextMenu();
+            });
+            
+            document.getElementById('translate').addEventListener('click', function() {
+                translate(selectedText);
+                hideContextMenu();
+            });
+            
+            function showContextMenu(e) {
+                // 设置菜单位置
+                contextMenu.style.display = 'block';
+                contextMenu.style.left = `${e.pageX}px`;
+                contextMenu.style.top = `${e.pageY}px`;
+            }
+            
+            function hideContextMenu() {
+                contextMenu.style.display = 'none';
+            }
+            
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        alert('已复制到剪贴板: ' + text);
+                    })
+                    .catch(err => {
+                        console.error('复制失败:', err);
+                        // 兼容性处理
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        alert('已复制到剪贴板: ' + text);
+                    });
+            }
+            
+            function searchOnGoogle(text) {
+                if (text) {
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(text)}`, '_blank');
+                }
+            }
+            
+            function translate(text) {
+              if(text) {
+                alert('翻译 → ' + text);
+              }
+              
+            }
+            
+        });
+    </script>
+</body>
+</html>

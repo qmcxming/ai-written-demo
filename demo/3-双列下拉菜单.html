@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>双列下拉菜单</title>
+  <style>
+    .dropdown {
+      position: relative;
+      display: inline-block;
+      font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .dropdown-btn {
+      background-color: #409EFF;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      min-width: 160px;
+      text-align: center;
+    }
+
+    .dropdown-panel {
+      opacity: 0;
+      transform: scaleY(0.95);
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      transform-origin: top;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 8px;
+      background-color: white;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      padding: 10px;
+      z-index: 1000;
+      display: flex;
+      gap: 20px;
+      pointer-events: none;
+    }
+
+    .dropdown.show .dropdown-panel {
+      opacity: 1;
+      transform: scaleY(1);
+      max-height: none;
+      /* 不在这限制高度 */
+      pointer-events: auto;
+    }
+
+    .dropdown-panel .dropdown-column {
+      display: flex;
+      flex-direction: column;
+      max-height: 200px;
+      /* 每列最大高度 */
+      overflow-y: auto;
+      /* 各自滚动 */
+      padding-right: 4px;
+      /* 给滚动条留点位置 */
+    }
+
+    .dropdown-column::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .dropdown-column::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 3px;
+    }
+
+    .dropdown-column::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+
+
+    .dropdown-item {
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .dropdown-item:hover {
+      background-color: #f5f7fa;
+    }
+
+    .dropdown-item.active {
+      background-color: #e0f0ff;
+      font-weight: bold;
+      color: #409EFF;
+    }
+
+
+    .arrow {
+      display: inline-block;
+      margin-left: 8px;
+      transition: transform 0.3s ease;
+    }
+
+    .dropdown.show .arrow {
+      transform: rotate(180deg);
+    }
+
+    /* engine */
+    .engine-panel {
+      width: 160px;
+    }
+
+    #engine-dropdown .dropdown-panel {
+      flex-direction: column;
+      gap: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="dropdown" id="dropdown">
+    <div class="dropdown-btn" id="dropdown-btn">
+      <span class="caret">中文 → 英文 </span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="dropdown-panel">
+      <div class="dropdown-column" id="source-list">
+        <div class="dropdown-item">中文</div>
+        <div class="dropdown-item">英文</div>
+        <div class="dropdown-item">日语</div>
+        <div class="dropdown-item">韩语</div>
+        <div class="dropdown-item">法语</div>
+        <div class="dropdown-item">德语</div>
+        <div class="dropdown-item">西班牙语</div>
+        <div class="dropdown-item">葡萄牙语</div>
+        <div class="dropdown-item">俄语</div>
+      </div>
+      <div class="dropdown-column" id="target-list">
+        <div class="dropdown-item">中文</div>
+        <div class="dropdown-item">英文</div>
+        <div class="dropdown-item">日语</div>
+        <div class="dropdown-item">韩语</div>
+        <div class="dropdown-item">法语</div>
+        <div class="dropdown-item">德语</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dropdown" id="engine-dropdown">
+    <div class="dropdown-btn" id="engine-btn">
+      <span class="engine-label">翻译引擎：Google</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="dropdown-panel engine-panel">
+      <div class="dropdown-column" id="engine-list">
+        <div class="dropdown-item">Google</div>
+        <div class="dropdown-item">Baidu</div>
+        <div class="dropdown-item">Tencent</div>
+        <div class="dropdown-item">Youdao</div>
+        <div class="dropdown-item">DeepL</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const dropdown = document.getElementById('dropdown');
+    const dropdownBtn = document.getElementById('dropdown-btn');
+    const sourceList = document.getElementById('source-list');
+    const targetList = document.getElementById('target-list');
+
+    let sourceLang = '中文';
+    let targetLang = '英文';
+
+    dropdownBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); // 防止触发 window 关闭逻辑
+      dropdown.classList.toggle('show');
+    });
+
+    // 选择源语言（左侧）
+    sourceList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('dropdown-item')) {
+        const selected = e.target.textContent;
+        if (selected !== targetLang) {
+          sourceLang = selected;
+          highlightActive(sourceList, selected);
+          updateBtnText(); // 只更新按钮文本，不关闭菜单
+        } else {
+          alert('源语言和目标语言不能相同！');
+        }
+      }
+    });
+
+    // 选择目标语言（右侧）
+    targetList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('dropdown-item')) {
+        const selected = e.target.textContent;
+        if (selected !== sourceLang) {
+          targetLang = selected;
+          highlightActive(targetList, selected);
+          updateBtn(); // 右侧点击后关闭菜单
+        } else {
+          alert('源语言和目标语言不能相同！');
+        }
+      }
+    });
+
+    // 高亮选中的语言项
+    function highlightActive(listEl, selectedText) {
+      Array.from(listEl.children).forEach(item => {
+        item.classList.toggle('active', item.textContent === selectedText);
+      });
+    }
+
+    function updateBtn() {
+      updateBtnText();
+      dropdown.classList.remove('show');
+    }
+
+    function updateBtnText() {
+      dropdownBtn.querySelector('.caret').innerHTML = `${sourceLang} → ${targetLang}`;
+    }
+
+    // 点击空白处关闭
+    window.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    highlightActive(sourceList, sourceLang);
+    highlightActive(targetList, targetLang);
+
+    const engineDropdown = document.getElementById('engine-dropdown');
+    const engineBtn = document.getElementById('engine-btn');
+    const engineList = document.getElementById('engine-list');
+    let currentEngine = 'Google';
+
+    engineBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      engineDropdown.classList.toggle('show');
+    });
+
+    engineList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('dropdown-item')) {
+        currentEngine = e.target.textContent;
+        highlightActive(engineList, currentEngine);
+        updateEngineBtn();
+        engineDropdown.classList.remove('show');
+      }
+    });
+
+    function updateEngineBtn() {
+      engineBtn.querySelector('.engine-label').innerText = `翻译引擎：${currentEngine}`;
+    }
+
+    // 关闭所有下拉菜单
+    window.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target)) dropdown.classList.remove('show');
+      if (!engineDropdown.contains(e.target)) engineDropdown.classList.remove('show');
+    });
+
+    // 初始化默认选中项
+    highlightActive(engineList, currentEngine);
+  </script>
+
+</body>
+
+</html>
