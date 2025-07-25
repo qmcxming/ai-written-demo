@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>千问编写-文本与乱码互转工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .converter-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        #encodeBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #decodeBtn {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        #copyBtn {
+            background-color: #9C27B0;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .info {
+            margin-top: 20px;
+            color: #555;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>文本与乱码互转工具</h1>
+    
+    <div class="converter-container">
+        <textarea id="inputText" placeholder="请输入要转换的文本..."></textarea>
+        
+        <div class="button-group">
+            <button id="encodeBtn">文本转乱码</button>
+            <button id="decodeBtn">乱码转文本</button>
+        </div>
+        
+        <textarea id="outputText" placeholder="转换结果将显示在这里..."></textarea>
+        
+        <button id="copyBtn">复制结果</button>
+        
+        <div class="info">
+            <h3>说明：</h3>
+            <p>本工具使用简单的字符映射算法实现文本与乱码的相互转换。</p>
+            <p>文本转乱码：将每个字符映射为一个随机生成的特殊字符组合</p>
+            <p>乱码转文本：将乱码按照预设的映射关系还原为原始文本</p>
+        </div>
+    </div>
+
+    <script>
+        // 创建字符映射
+        const charMap = {};
+        const specialChars = "!@#$%^&*()_+-=[]{}|;':\",./<>?";
+        
+        // 初始化字符映射
+        function initCharMap() {
+            // 包括基本拉丁字符和常用汉字
+            const allChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" +
+                           " !\"#$%&'()*+,-./:;<=>?@[\$$^_`{|}~" +
+                           "абвгдежзийклмнопрстуфхцчшщъыьэюя" +  // 西里尔字母
+                           "àáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ" +  // 拉丁扩展A
+                           "ĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĤĥĦħĨĩĪīĬĭĮįİıĵĴĶķĸĹĺĻļĽľĿŀŁł" +  // 拉丁扩展B
+                           "āăąćĉċčďđēĕėęěĝğġĥħĩīĭįıĵĵķĸĺļľŀłńņňŉŋōŏőœŕŗřśŝşšţťŧūŭůűųŵŷŷźżž";
+            
+            for (let i = 0; i < allChars.length; i++) {
+                let randomStr = '';
+                // 生成3-5个特殊字符的随机组合
+                const length = Math.floor(Math.random() * 3) + 3;
+                for (let j = 0; j < length; j++) {
+                    randomStr += specialChars[Math.floor(Math.random() * specialChars.length)];
+                }
+                charMap[allChars[i]] = randomStr;
+            }
+        }
+        
+        // 文本转乱码
+        function textToGarbled(text) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (charMap[char]) {
+                    result += charMap[char];
+                } else {
+                    // 如果找不到映射，使用原字符并加上特殊标记
+                    result += `#${char}#`;
+                }
+            }
+            return result;
+        }
+        
+        // 乱码转文本
+        function garbledToText(garbledText) {
+            let result = '';
+            let remainingText = garbledText;
+            
+            // 创建反向映射
+            const reverseMap = {};
+            Object.keys(charMap).forEach(key => {
+                reverseMap[charMap[key]] = key;
+            });
+            
+            // 按最长映射值长度进行匹配
+            const maxMappingLength = Math.max(...Object.keys(charMap).map(key => charMap[key].length));
+            
+            while (remainingText.length > 0) {
+                let found = false;
+                // 尝试从长到短匹配
+                for (let i = maxMappingLength; i > 0; i--) {
+                    const segment = remainingText.substring(0, i);
+                    if (reverseMap[segment]) {
+                        result += reverseMap[segment];
+                        remainingText = remainingText.substring(i);
+                        found = true;
+                        break;
+                    }
+                }
+                
+                // 如果没有找到匹配的映射（可能是特殊标记），则处理单个字符
+                if (!found) {
+                    // 检查是否是特殊标记
+                    if (remainingText.startsWith('#') && remainingText.indexOf('#', 1) > 1) {
+                        const endIndex = remainingText.indexOf('#', 1);
+                        result += remainingText.substring(1, endIndex);
+                        remainingText = remainingText.substring(endIndex + 1);
+                    } else {
+                        result += remainingText[0];
+                        remainingText = remainingText.substring(1);
+                    }
+                }
+            }
+            
+            return result;
+        }
+        
+        // 初始化字符映射
+        initCharMap();
+        
+        // 事件监听
+        document.getElementById('encodeBtn').addEventListener('click', () => {
+            const input = document.getElementById('inputText').value;
+            const encoded = textToGarbled(input);
+            document.getElementById('outputText').value = encoded;
+        });
+        
+        document.getElementById('decodeBtn').addEventListener('click', () => {
+            const input = document.getElementById('inputText').value;
+            const decoded = garbledToText(input);
+            document.getElementById('outputText').value = decoded;
+        });
+        
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const outputText = document.getElementById('outputText');
+            outputText.select();
+            document.execCommand('copy');
+            
+            // 显示复制成功提示
+            const copyBtn = document.getElementById('copyBtn');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = '复制成功!';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
