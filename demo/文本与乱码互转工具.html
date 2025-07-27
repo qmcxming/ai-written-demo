@@ -1,220 +1,154 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>千问编写-文本与乱码互转工具</title>
+    <title>ChatGPT-文本乱码互转工具</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            padding: 10px 20px;
+            background: #f9f9f9;
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f0f0f0;
+            margin: auto;
         }
 
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .converter-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-top: 30px;
+        h2 {
+            margin-top: 20px;
         }
 
         textarea {
             width: 100%;
-            height: 150px;
+            height: 120px;
             padding: 10px;
-            font-size: 16px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
             resize: vertical;
             box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
             outline: none;
+            transition: border-color 0.3s ease;
+            resize: none;
         }
 
-        .button-group {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
+        textarea:focus {
+            border-color: #1677ff;
         }
 
         button {
-            flex: 1;
-            padding: 12px;
-            font-size: 16px;
+            padding: 10px 20px;
+            margin: 5px 10px 10px 0;
+            background-color: #1677ff;
+            color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 3px;
             cursor: pointer;
-            margin: 0 5px;
+            transition: background-color 0.3s ease;
         }
 
-        #encodeBtn {
-            background-color: #4CAF50;
-            color: white;
+        .btn-plain {
+            background-color: transparent;
+            color: #1677ff;
+            border: 1px solid #1677ff;
         }
 
-        #decodeBtn {
-            background-color: #2196F3;
-            color: white;
+        .btn-plain:hover {
+            color: #105fd6;
+            border: 1px solid #105fd6;
+            background-color: transparent;
         }
 
-        #copyBtn {
-            background-color: #9C27B0;
-            color: white;
-            margin-top: 10px;
+        button:hover {
+            background-color: #105fd6;
         }
 
-        .info {
-            margin-top: 20px;
-            color: #555;
-            font-size: 14px;
+        .danger {
+            background-color: #f44336;
+        }
+
+        .danger:hover {
+            background-color: #d32f2f;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-group button {
+            flex: 1;
+        }
+
+        .btn-group button:last-child {
+            margin-right: 0;
         }
     </style>
 </head>
+
 <body>
-    <h1>文本与乱码互转工具</h1>
-    
-    <div class="converter-container">
-        <textarea id="inputText" placeholder="请输入要转换的文本..."></textarea>
-        
-        <div class="button-group">
-            <button id="encodeBtn">文本转乱码</button>
-            <button id="decodeBtn">乱码转文本</button>
-        </div>
-        
-        <textarea id="outputText" placeholder="转换结果将显示在这里..."></textarea>
-        
-        <button id="copyBtn">复制结果</button>
-        
-        <div class="info">
-            <h3>说明：</h3>
-            <p>本工具使用简单的字符映射算法实现文本与乱码的相互转换。</p>
-            <p>文本转乱码：将每个字符映射为一个随机生成的特殊字符组合</p>
-            <p>乱码转文本：将乱码按照预设的映射关系还原为原始文本</p>
-        </div>
+    <h2 style="text-align: center;">
+        文本与乱码互转工具
+    </h2>
+    <textarea id="inputText" placeholder="请输入原文或乱码文本（自动识别原文或乱码）"></textarea>
+    <div class="btn-group">
+        <button onclick="autoConvert()">自动转换</button>
+        <button class="btn-plain" onclick="copyResult()">复制结果</button>
+        <button class="danger" onclick="clearAll()">清除</button>
+    </div>
+    <textarea id="outputText" readonly placeholder="这里显示转换后的结果"></textarea>
+
+    <div
+        style="margin-top: 30px; padding: 15px; background: #eef5ff; border-left: 4px solid #1677ff; border-radius: 5px;">
+        <strong>📌 使用说明：</strong>
+        <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.6;">
+            <li>将 <strong>原始文本</strong> 或 <strong>乱码</strong> 粘贴到输入框</li>
+            <li>点击 <strong>【自动转换】</strong> 按钮，系统将自动识别并转换</li>
+            <li>转换结果显示在下方结果框中</li>
+            <li>点击 <strong>【复制结果】</strong> 可快速复制内容</li>
+            <li>如需重新操作，可点击 <strong>【清除】</strong> 清空所有内容</li>
+        </ul>
     </div>
 
     <script>
-        // 创建字符映射
-        const charMap = {};
-        const specialChars = "!@#$%^&*()_+-=[]{}|;':\",./<>?";
-        
-        // 初始化字符映射
-        function initCharMap() {
-            // 包括基本拉丁字符和常用汉字
-            const allChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" +
-                           " !\"#$%&'()*+,-./:;<=>?@[\$$^_`{|}~" +
-                           "абвгдежзийклмнопрстуфхцчшщъыьэюя" +  // 西里尔字母
-                           "àáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ" +  // 拉丁扩展A
-                           "ĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĤĥĦħĨĩĪīĬĭĮįİıĵĴĶķĸĹĺĻļĽľĿŀŁł" +  // 拉丁扩展B
-                           "āăąćĉċčďđēĕėęěĝğġĥħĩīĭįıĵĵķĸĺļľŀłńņňŉŋōŏőœŕŗřśŝşšţťŧūŭůűųŵŷŷźżž";
-            
-            for (let i = 0; i < allChars.length; i++) {
-                let randomStr = '';
-                // 生成3-5个特殊字符的随机组合
-                const length = Math.floor(Math.random() * 3) + 3;
-                for (let j = 0; j < length; j++) {
-                    randomStr += specialChars[Math.floor(Math.random() * specialChars.length)];
-                }
-                charMap[allChars[i]] = randomStr;
-            }
-        }
-        
-        // 文本转乱码
-        function textToGarbled(text) {
-            let result = '';
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                if (charMap[char]) {
-                    result += charMap[char];
-                } else {
-                    // 如果找不到映射，使用原字符并加上特殊标记
-                    result += `#${char}#`;
-                }
-            }
-            return result;
-        }
-        
-        // 乱码转文本
-        function garbledToText(garbledText) {
-            let result = '';
-            let remainingText = garbledText;
-            
-            // 创建反向映射
-            const reverseMap = {};
-            Object.keys(charMap).forEach(key => {
-                reverseMap[charMap[key]] = key;
-            });
-            
-            // 按最长映射值长度进行匹配
-            const maxMappingLength = Math.max(...Object.keys(charMap).map(key => charMap[key].length));
-            
-            while (remainingText.length > 0) {
-                let found = false;
-                // 尝试从长到短匹配
-                for (let i = maxMappingLength; i > 0; i--) {
-                    const segment = remainingText.substring(0, i);
-                    if (reverseMap[segment]) {
-                        result += reverseMap[segment];
-                        remainingText = remainingText.substring(i);
-                        found = true;
-                        break;
+        // 自动识别并转换
+        function autoConvert() {
+            const input = document.getElementById('inputText').value.trim();
+            const isGarble = /^§[0-9a-z§]+$/i.test(input);  // 判断是否乱码格式
+
+            if (isGarble) {
+                // 解密
+                const parts = input.split('§').filter(Boolean);
+                let decoded = '';
+                for (let part of parts) {
+                    const code = parseInt(part, 36);
+                    if (!isNaN(code)) {
+                        decoded += String.fromCharCode(code);
                     }
                 }
-                
-                // 如果没有找到匹配的映射（可能是特殊标记），则处理单个字符
-                if (!found) {
-                    // 检查是否是特殊标记
-                    if (remainingText.startsWith('#') && remainingText.indexOf('#', 1) > 1) {
-                        const endIndex = remainingText.indexOf('#', 1);
-                        result += remainingText.substring(1, endIndex);
-                        remainingText = remainingText.substring(endIndex + 1);
-                    } else {
-                        result += remainingText[0];
-                        remainingText = remainingText.substring(1);
-                    }
+                document.getElementById('outputText').value = decoded;
+            } else {
+                // 加密
+                let encoded = '';
+                for (let i = 0; i < input.length; i++) {
+                    const code = input.charCodeAt(i).toString(36);
+                    encoded += `§${code}`;
                 }
+                document.getElementById('outputText').value = encoded;
             }
-            
-            return result;
         }
-        
-        // 初始化字符映射
-        initCharMap();
-        
-        // 事件监听
-        document.getElementById('encodeBtn').addEventListener('click', () => {
-            const input = document.getElementById('inputText').value;
-            const encoded = textToGarbled(input);
-            document.getElementById('outputText').value = encoded;
-        });
-        
-        document.getElementById('decodeBtn').addEventListener('click', () => {
-            const input = document.getElementById('inputText').value;
-            const decoded = garbledToText(input);
-            document.getElementById('outputText').value = decoded;
-        });
-        
-        document.getElementById('copyBtn').addEventListener('click', () => {
-            const outputText = document.getElementById('outputText');
-            outputText.select();
+
+        function copyResult() {
+            const output = document.getElementById('outputText');
+            output.select();
             document.execCommand('copy');
-            
-            // 显示复制成功提示
-            const copyBtn = document.getElementById('copyBtn');
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = '复制成功!';
-            setTimeout(() => {
-                copyBtn.textContent = originalText;
-            }, 2000);
-        });
+            alert('已复制到剪贴板！');
+        }
+
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+        }
     </script>
 </body>
+
 </html>
