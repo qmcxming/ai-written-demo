@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatGPT-文本乱码互转工具</title>
     <style>
         body {
@@ -37,7 +38,7 @@
 
         button {
             padding: 10px 20px;
-            margin: 5px 10px 10px 0;
+            margin: 5px 0 10px 0;
             background-color: #1677ff;
             color: white;
             border: none;
@@ -73,14 +74,11 @@
         .btn-group {
             display: flex;
             justify-content: space-between;
+            gap: 10px;
         }
 
         .btn-group button {
             flex: 1;
-        }
-
-        .btn-group button:last-child {
-            margin-right: 0;
         }
     </style>
 </head>
@@ -94,6 +92,7 @@
         <button onclick="autoConvert()">自动转换</button>
         <button class="btn-plain" onclick="copyResult()">复制结果</button>
         <button class="danger" onclick="clearAll()">清除</button>
+        <button style="display: none;" id="jumpLinkBtn" onclick="jumpLink()">跳转链接</button>
     </div>
     <textarea id="outputText" readonly placeholder="这里显示转换后的结果"></textarea>
 
@@ -126,6 +125,9 @@
                     }
                 }
                 document.getElementById('outputText').value = decoded;
+                if (decoded.startsWith('http') || decoded.startsWith('https')) {
+                    document.getElementById('jumpLinkBtn').style.display = 'block';
+                }
             } else {
                 // 加密
                 let encoded = '';
@@ -147,6 +149,15 @@
         function clearAll() {
             document.getElementById('inputText').value = '';
             document.getElementById('outputText').value = '';
+            document.getElementById('jumpLinkBtn').style.display = 'none';
+        }
+
+        function jumpLink() {
+            const outputText = document.getElementById('outputText');
+            if (outputText.value) {
+                // 跳转链接
+                location.href = outputText.value;
+            }
         }
     </script>
 </body>
