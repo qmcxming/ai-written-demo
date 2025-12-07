@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>灵动胶囊-自写</title>
+  <style>
+    :root {
+      /* --body-bg: rgb(0, 0, 0); */
+      /* --bg: rgb(255, 255, 255); */
+      /* --text: rgb(0, 0, 0); */
+      --body-bg: #fff;
+      --bg: rgb(0, 0, 0);
+      --text: rgb(255, 255, 255);
+    }
+
+    body {
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 50px;
+      gap: 10px;
+      background-color: var(--body-bg);
+      font-size: 14px;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      color: var(--text);
+    }
+
+    .capsule-container {
+      width: 300px;
+      height: 30px;
+      padding: 10px 15px;
+      display: flex;
+      background-color: var(--bg);
+      color: var(--text);
+      align-items: center;
+      overflow: hidden;
+      border-radius: 30px;
+      gap: 8px;
+    }
+
+    .center {
+      height: 30px;
+      flex: 1;
+      overflow-x: auto;
+      white-space: nowrap;
+      box-sizing: border-box;
+      line-height: 30px;
+    }
+
+    /* 隐藏滚动条 */
+    .center::-webkit-scrollbar {
+      display: none;
+    }
+
+    .left,
+    .right {
+      display: flex;
+    }
+
+    .loading {
+      animation: revolve 1s linear infinite;
+    }
+
+    /* right旋转动画360度旋转 */
+    @keyframes revolve {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #input {
+      width: 300px;
+      height: 30px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>翻译中</h2>
+  <div class="capsule-container">
+    <div class="left">
+      <svg t="1765082912109" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+        p-id="6603" width="512" height="512">
+        <path
+          d="M243.498667 840.832a42.666667 42.666667 0 0 1-60.330667-60.330667L451.669333 512 183.168 243.498667a42.666667 42.666667 0 0 1 60.330667-60.330667L512 451.669333l268.501333-268.501333a42.666667 42.666667 0 1 1 60.330667 60.330667L572.330667 512l268.501333 268.501333a42.666667 42.666667 0 0 1-60.330667 60.330667L512 572.330667l-268.501333 268.501333z"
+          fill="currentColor" p-id="6604"></path>
+      </svg>
+    </div>
+    <div class="center"></div>
+    <div class="right loading">
+      <svg t="1765082897555" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+        p-id="6438" width="512" height="512">
+        <path
+          d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667-42.666667c235.648 0 426.666667 191.018667 426.666667 426.666667a42.666667 42.666667 0 1 1-85.333334 0 341.333333 341.333333 0 0 0-341.333333-341.333333 42.666667 42.666667 0 0 1-42.666667-42.666667z"
+          fill="currentColor" p-id="6439"></path>
+      </svg>
+    </div>
+  </div>
+  <h2>翻译后，拖拽图标可拖动文本</h2>
+  <div class="capsule-container">
+    <div class="left">
+      <svg t="1765084822865" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+        p-id="7125" width="512" height="512">
+        <path
+          d="M554.666667 170.666667H298.666667a85.333333 85.333333 0 0 0-85.333334 85.333333v256a42.666667 42.666667 0 1 1-85.333333 0V256a170.666667 170.666667 0 0 1 170.666667-170.666667h256a170.666667 170.666667 0 0 1 170.666666 170.666667 128 128 0 0 1 128 128v298.666667a213.333333 213.333333 0 0 1-213.333333 213.333333h-213.333333a128 128 0 0 1-128-128 170.581333 170.581333 0 0 1-149.034667-87.466667l-0.085333-0.128a42.666667 42.666667 0 0 1 76.373333-38.186666l0.128-0.042667c15.061333 24.32 41.941333 40.490667 72.618667 40.490667h256a85.333333 85.333333 0 0 0 85.333333-85.333334V256a85.333333 85.333333 0 0 0-85.333333-85.333333z m170.666666 170.666666v256a170.666667 170.666667 0 0 1-170.666666 170.666667H384a42.666667 42.666667 0 0 0 42.666667 42.666667h213.333333a128 128 0 0 0 128-128V384a42.666667 42.666667 0 0 0-42.666667-42.666667zM341.333333 298.666667a42.666667 42.666667 0 0 0 0 85.333333h170.666667a42.666667 42.666667 0 1 0 0-85.333333H341.333333z m-42.666666 213.333333a42.666667 42.666667 0 0 1 42.666666-42.666667h170.666667a42.666667 42.666667 0 1 1 0 85.333334H341.333333a42.666667 42.666667 0 0 1-42.666666-42.666667z"
+          fill="currentColor" p-id="7126"></path>
+      </svg>
+    </div>
+    <div class="center">A small global sphere, with a few flies hitting the wall. Buzzing, a few screams, a few sobs.
+      Ants exaggerate the country because of the locust tree, and it is not easy to shake the tree. Just as the west
+      wind blows, the fallen leaves descend from Chang'an, and the sound of arrows flutters.
+      How many things are always urgent; The world turns, time is pressing. Ten thousand years is too long, only the day
+      is competing. The four seas are tumultuous and the clouds and waters are angry, and the five continents are shaken
+      by wind and thunder. To sweep away all harmful insects, they are all invincible.</div>
+    <div class="right drag-icon">
+      <svg t="1765084782131" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+        p-id="6960" width="512" height="512">
+        <path
+          d="M128 234.666667A64 64 0 0 1 192 170.666667h640a64 64 0 0 1 0 128h-640A64 64 0 0 1 128 234.666667zM128 512a64 64 0 0 1 64-64h640a64 64 0 0 1 0 128h-640A64 64 0 0 1 128 512z m64 213.333333a64 64 0 0 0 0 128h640a64 64 0 0 0 0-128h-640z"
+          fill="currentColor" p-id="6961"></path>
+      </svg>
+    </div>
+  </div>
+  <h2>测试拖拽</h2>
+  <input type="text" name="text" id="input" placeholder="请输入内容">
+  <script>
+    // 改为拖拽右侧的 drag-icon 来传文本（不再把 .center 设置为 draggable）
+    document.querySelectorAll('.drag-icon').forEach(icon => {
+      icon.setAttribute('draggable', 'true');
+
+      icon.addEventListener('dragstart', (e) => {
+        // 找到当前 capsule 内的 .center 文本
+        const container = icon.closest('.capsule-container');
+        const center = container?.querySelector('.center');
+        const text = center ? center.textContent.trim() : '';
+        if (!text) {
+          e.preventDefault();
+          return;
+        }
+        e.dataTransfer.setData('text/plain', text);
+        // 使用透明画布避免默认拖影
+        const canvas = document.createElement('canvas');
+        canvas.width = 1; canvas.height = 1;
+        e.dataTransfer.setDragImage(canvas, 0, 0);
+      });
+    });
+
+    const input = document.getElementById('input');
+
+    // 允许放置
+    input.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+
+    // 处理放置：将拖入的文本插入到当前光标位置
+    input.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const text = e.dataTransfer.getData('text/plain');
+      if (!text) return;
+      const start = input.selectionStart ?? input.value.length;
+      const end = input.selectionEnd ?? start;
+      const before = input.value.slice(0, start);
+      const after = input.value.slice(end);
+      input.value = before + text + after;
+      const pos = start + text.length;
+      input.setSelectionRange(pos, pos);
+      input.focus();
+    });
+  </script>
+</body>
+
+</html>
